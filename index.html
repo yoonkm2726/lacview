@@ -1234,6 +1234,21 @@
       to { transform: scale(1.2); opacity: 1; }
     }
   
+  
+    .top-btn.btn-cloud-save {
+      background: #2563eb !important;
+      color: #ffffff !important;
+      border-color: #1d4ed8 !important;
+      font-weight: 700 !important;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25);
+    }
+    .top-btn.btn-cloud-save:hover {
+      background: #1d4ed8 !important;
+    }
+    .top-btn.btn-cloud-save svg {
+      stroke: #ffffff !important;
+    }
+  
   </style>
 </head>
 <body>
@@ -1250,9 +1265,17 @@
     <div class="top-actions">
       <div class="cloud-sync-badge" id="cloudSyncBadge" title="실시간 클라우드 동기화">
         <span class="cloud-dot" id="cloudDot"></span>
-        <span id="cloudStatusText">로컬 모드</span>
+        <span id="cloudStatusText">연결중</span>
       </div>
-      <button type="button" class="top-btn primary" onclick="copySummaryReport()" title="결과 복사하기">
+      <button type="button" class="top-btn btn-cloud-save" onclick="manualSaveToCloud()" title="현재 입력값을 구글 서버에 영구 저장합니다">
+        <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+        서버 저장
+      </button>
+      <button type="button" class="top-btn" onclick="manualLoadFromCloud()" title="구글 서버의 저장된 데이터를 불러옵니다">
+        <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+        불러오기
+      </button>
+      <button type="button" class="top-btn" onclick="copySummaryReport()" title="결과 복사하기">
         <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
         결과 복사
       </button>
@@ -3463,6 +3486,125 @@
       text.textContent = label;
     }
 
+    
+    // [수동 구글 서버 저장 버튼]
+    function manualSaveToCloud() {
+      if (!fbRef) {
+        alert('구글 서버(Firebase)와 연결 준비 중입니다. 1~2초 후 다시 눌러주세요.');
+        return;
+      }
+      setCloudStatus('syncing', '서버 저장중');
+
+      try {
+        const payload = {
+          updatedAt: Date.now(),
+          savedBy: 'user',
+          inputs: {
+            salePrice: value('salePrice'),
+            existingLoan: value('existingLoan'),
+            newLoan: value('newLoan'),
+            loanYears: value('loanYears'),
+            interestRate: parseFloat(document.getElementById('interestRate').value) || 3.3
+          },
+          method: currentRepaymentMethod,
+          tax: {
+            newborn: isNewbornDeduction,
+            under85: isUnder85
+          },
+          savings: savingsItems,
+          presets: presetItems
+        };
+
+        // 로컬스토리지에도 백업
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload.inputs));
+          localStorage.setItem(SAVINGS_KEY, JSON.stringify(savingsItems));
+          localStorage.setItem(PRESET_KEY, JSON.stringify(presetItems));
+        } catch(e) {}
+
+        fbRef.set(payload, (error) => {
+          if (error) {
+            console.error('[Firebase 저장 에러]', error);
+            setCloudStatus('offline', '저장 실패');
+            alert('구글 서버 저장 실패: ' + error.message);
+          } else {
+            setCloudStatus('online', '구글서버 저장됨');
+            showToast('✅ 구글 서버에 성공적으로 저장되었습니다! 어디서든 이 값이 유지됩니다.');
+            setTimeout(() => { setCloudStatus('online', '실시간 동기화'); }, 3000);
+          }
+        });
+      } catch (err) {
+        alert('저장 중 오류 발생: ' + err.message);
+      }
+    }
+
+    // [수동 구글 서버 불러오기 버튼]
+    function manualLoadFromCloud() {
+      if (!fbRef) {
+        alert('구글 서버(Firebase)와 연결 준비 중입니다. 잠시 후 다시 눌러주세요.');
+        return;
+      }
+      setCloudStatus('syncing', '불러오는중');
+
+      fbRef.once('value').then((snapshot) => {
+        const val = snapshot.val();
+        if (!val) {
+          showToast('구글 서버에 저장된 데이터가 없습니다.');
+          setCloudStatus('online', '실시간 동기화');
+          return;
+        }
+
+        applyCloudDataToUI(val);
+        setCloudStatus('online', '불러오기 완료');
+        showToast('✅ 구글 서버의 최신 데이터를 불러왔습니다!');
+        setTimeout(() => { setCloudStatus('online', '실시간 동기화'); }, 2500);
+      }).catch((err) => {
+        alert('구글 서버 불러오기 실패: ' + err.message);
+      });
+    }
+
+    // 서버 데이터를 화면 UI에 정확히 바인딩하는 공통 함수
+    function applyCloudDataToUI(val) {
+      if (!val) return;
+      isRemoteUpdate = true;
+      try {
+        if (val.inputs) {
+          if (val.inputs.salePrice !== undefined) document.getElementById('salePrice').value = val.inputs.salePrice;
+          if (val.inputs.existingLoan !== undefined) document.getElementById('existingLoan').value = val.inputs.existingLoan;
+          if (val.inputs.newLoan !== undefined) document.getElementById('newLoan').value = val.inputs.newLoan;
+          if (val.inputs.loanYears !== undefined) document.getElementById('loanYears').value = val.inputs.loanYears;
+          if (val.inputs.interestRate !== undefined) document.getElementById('interestRate').value = val.inputs.interestRate;
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(val.inputs)); } catch(e) {}
+        }
+        if (val.method) {
+          setRepaymentMethod(val.method);
+        }
+        if (val.tax) {
+          if (val.tax.newborn !== undefined) {
+            isNewbornDeduction = val.tax.newborn;
+            document.getElementById('taxNewbornCheck').checked = isNewbornDeduction;
+          }
+          if (val.tax.under85 !== undefined) {
+            isUnder85 = val.tax.under85;
+            document.getElementById('taxUnder85Check').checked = isUnder85;
+          }
+        }
+        if (val.savings && Array.isArray(val.savings)) {
+          savingsItems = val.savings;
+          renderSavings();
+          try { localStorage.setItem(SAVINGS_KEY, JSON.stringify(savingsItems)); } catch(e) {}
+        }
+        if (val.presets && Array.isArray(val.presets)) {
+          presetItems = val.presets;
+          renderPresets();
+          try { localStorage.setItem(PRESET_KEY, JSON.stringify(presetItems)); } catch(e) {}
+        }
+        calculate();
+      } finally {
+        setTimeout(() => { isRemoteUpdate = false; }, 200);
+      }
+    }
+  
     function initFirebaseSync() {
       const cfg = CFG.firebaseConfig;
       const badge = document.getElementById('cloudSyncBadge');
@@ -3492,61 +3634,14 @@
           }
         });
 
-        // 원격 실시간 데이터 수신 (다른 사람이 수정하면 0.1초 만에 자동 반영)
+        // 구글 서버 실시간 리스너: 어디서든 접속 시 구글 서버 최신 데이터를 1순위로 즉시 로드
         fbRef.on('value', (snapshot) => {
           const val = snapshot.val();
           if (!val) return;
           if (isRemoteUpdate) return;
-
-          console.log('[Firebase] 원격 최신 데이터 수신:', val);
-          isRemoteUpdate = true;
-
-          try {
-            // 1. 기본 인풋
-            if (val.inputs) {
-              if (val.inputs.salePrice !== undefined) document.getElementById('salePrice').value = val.inputs.salePrice;
-              if (val.inputs.existingLoan !== undefined) document.getElementById('existingLoan').value = val.inputs.existingLoan;
-              if (val.inputs.newLoan !== undefined) document.getElementById('newLoan').value = val.inputs.newLoan;
-              if (val.inputs.loanYears !== undefined) document.getElementById('loanYears').value = val.inputs.loanYears;
-              if (val.inputs.interestRate !== undefined) document.getElementById('interestRate').value = val.inputs.interestRate;
-              
-              // 다음번 첫 접속 시 깜빡임 없이 즉시 뜨도록 로컬스토리지에도 즉시 저장
-              try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(val.inputs));
-              } catch(e) {}
-            }
-            // 2. 상환 방식
-            if (val.method) {
-              setRepaymentMethod(val.method);
-            }
-            // 3. 취득세 옵션
-            if (val.tax) {
-              if (val.tax.newborn !== undefined) {
-                isNewbornDeduction = val.tax.newborn;
-                document.getElementById('taxNewbornCheck').checked = isNewbornDeduction;
-              }
-              if (val.tax.under85 !== undefined) {
-                isUnder85 = val.tax.under85;
-                document.getElementById('taxUnder85Check').checked = isUnder85;
-              }
-            }
-            // 4. 보유 자금 리스트
-            if (val.savings && Array.isArray(val.savings)) {
-              savingsItems = val.savings;
-              renderSavings();
-              try { localStorage.setItem(SAVINGS_KEY, JSON.stringify(savingsItems)); } catch(e) {}
-            }
-            // 5. 프리셋 리스트
-            if (val.presets && Array.isArray(val.presets)) {
-              presetItems = val.presets;
-              renderPresets();
-            }
-
-            calculate();
-            showToast('다른 기기에서 수정한 내용이 실시간 동기화되었습니다.');
-          } finally {
-            setTimeout(() => { isRemoteUpdate = false; }, 300);
-          }
+          console.log('[Firebase] 구글 서버 최신 데이터 수신 및 적용:', val);
+          applyCloudDataToUI(val);
+          setCloudStatus('online', '실시간 동기화');
         });
 
         console.log('[Firebase] 실시간 클라우드 DB 연동 완료');
