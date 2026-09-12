@@ -43,6 +43,20 @@ const APARTMENT_CONFIG = {
     { name: "기타 입주 부대비용", note: "입주청소/줄눈 등", amount: 150 }
   ],
 
+  // 5. 구글 Firebase 실시간 클라우드 DB 연동 설정
+  // Firebase 콘솔에서 발급받은 키를 여기에 넣으시면 모든 사람의 화면이 실시간 자동 동기화됩니다!
+    // 5. 구글 Firebase 실시간 클라우드 DB 연동 설정
+  // 누구든 수정할 때마다 전 세계 모든 접속자 화면이 0.1초 만에 실시간 자동 동기화됩니다!
+  firebaseConfig: {
+    apiKey: "AIzaSyCtLucVUFBJcSXZqcU2eg2j5v65HUXsj0I",
+    authDomain: "lacview-14eaf.firebaseapp.com",
+    databaseURL: "https://lacview-14eaf-default-rtdb.firebaseio.com",
+    projectId: "lacview-14eaf",
+    storageBucket: "lacview-14eaf.firebasestorage.app",
+    messagingSenderId: "94070303919",
+    appId: "1:94070303919:web:a6aa3e25c3a1c271a8785a"
+  },
+
   // 4. 유의사항 안내 문구
   notices: [
     "대출 상환은 <strong>원리금균등, 원금균등, 체증식(HF디딤돌)</strong> 분할상환 방식으로 정밀 계산됩니다.",

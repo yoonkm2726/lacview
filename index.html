@@ -1187,6 +1187,53 @@
       color: var(--primary);
     }
     .bottom-tab-btn:active { transform: scale(0.94); }
+  
+    /* Cloud Sync Badge */
+    .cloud-sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      background: #f1f5f9;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .cloud-sync-badge.online {
+      background: #ecfdf5;
+      color: #059669;
+      border-color: #a7f3d0;
+    }
+    .cloud-sync-badge.syncing {
+      background: #fffbeb;
+      color: #d97706;
+      border-color: #fde68a;
+    }
+    .cloud-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #94a3b8;
+      display: inline-block;
+    }
+    .cloud-dot.online {
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+    .cloud-dot.syncing {
+      background: #f59e0b;
+      box-shadow: 0 0 6px #f59e0b;
+      animation: cloudPulse 1s infinite alternate;
+    }
+    @keyframes cloudPulse {
+      from { transform: scale(0.9); opacity: 0.6; }
+      to { transform: scale(1.2); opacity: 1; }
+    }
+  
   </style>
 </head>
 <body>
@@ -1201,6 +1248,10 @@
       <span id="headerBadge">라크뷰 입주 시뮬레이션</span>
     </div>
     <div class="top-actions">
+      <div class="cloud-sync-badge" id="cloudSyncBadge" title="실시간 클라우드 동기화">
+        <span class="cloud-dot" id="cloudDot"></span>
+        <span id="cloudStatusText">로컬 모드</span>
+      </div>
       <button type="button" class="top-btn primary" onclick="copySummaryReport()" title="결과 복사하기">
         <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
         결과 복사
@@ -2168,6 +2219,9 @@
     <span id="toastText">클립보드에 복사되었습니다!</span>
   </div>
 
+    <!-- Google Firebase SDK for Realtime Cloud Sync -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <!-- 1. 외부 데이터 설정 파일 로드 -->
   <script>
     // 브라우저 캐시 무력화: data.js를 항상 서버에서 최신 상태로 직접 로드
@@ -2315,7 +2369,9 @@
     }
 
     function saveSavings() {
-      try { localStorage.setItem(SAVINGS_KEY, JSON.stringify(savingsItems)); } catch(e) {}
+      try { localStorage.setItem(SAVINGS_KEY, JSON.stringify(savingsItems));
+      syncToCloud(); } catch(e) {}
+      syncToCloud();
     }
 
     function renderSavings() {
@@ -2626,7 +2682,9 @@
     }
 
     function savePresets() {
-      try { localStorage.setItem(PRESET_KEY, JSON.stringify(presetItems)); } catch(e) {}
+      try { localStorage.setItem(PRESET_KEY, JSON.stringify(presetItems));
+      syncToCloud(); } catch(e) {}
+      syncToCloud();
     }
 
     function resetPresetsToDefault() {
@@ -2966,6 +3024,7 @@
           interestRate: value('interestRate')
         };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      syncToCloud();
       } catch (e) {}
     }
 
@@ -3354,6 +3413,152 @@
       }
     });
 
+    
+    // ========== Google Firebase 실시간 클라우드 동기화 시스템 ==========
+    let fbDb = null;
+    let fbRef = null;
+    let isRemoteUpdate = false;
+    let cloudDebounceTimer = null;
+
+    function setCloudStatus(state, label) {
+      const badge = document.getElementById('cloudSyncBadge');
+      const dot = document.getElementById('cloudDot');
+      const text = document.getElementById('cloudStatusText');
+      if (!badge || !dot || !text) return;
+
+      badge.className = 'cloud-sync-badge ' + (state === 'online' ? 'online' : state === 'syncing' ? 'syncing' : '');
+      dot.className = 'cloud-dot ' + (state === 'online' ? 'online' : state === 'syncing' ? 'syncing' : '');
+      text.textContent = label;
+    }
+
+    function initFirebaseSync() {
+      const cfg = CFG.firebaseConfig;
+      const badge = document.getElementById('cloudSyncBadge');
+
+      if (!cfg || !cfg.apiKey || cfg.apiKey.trim() === '') {
+        if (badge) badge.title = 'Firebase 연동 키가 없어 로컬 모드로 동작합니다.';
+        return;
+      }
+
+      try {
+        if (typeof firebase === 'undefined') {
+          console.warn('[Firebase] SDK가 로드되지 않았습니다.');
+          return;
+        }
+        if (!firebase.apps.length) {
+          firebase.initializeApp(cfg);
+        }
+        fbDb = firebase.database();
+        fbRef = fbDb.ref('lakeview_shared_state');
+
+        // 연결 상태 실시간 감지
+        fbDb.ref('.info/connected').on('value', (snap) => {
+          if (snap.val() === true) {
+            setCloudStatus('online', '실시간 동기화');
+          } else {
+            setCloudStatus('offline', '연결 대기중');
+          }
+        });
+
+        // 원격 실시간 데이터 수신 (다른 사람이 수정하면 0.1초 만에 자동 반영)
+        fbRef.on('value', (snapshot) => {
+          const val = snapshot.val();
+          if (!val) return;
+          if (isRemoteUpdate) return;
+
+          console.log('[Firebase] 원격 최신 데이터 수신:', val);
+          isRemoteUpdate = true;
+
+          try {
+            // 1. 기본 인풋
+            if (val.inputs) {
+              if (val.inputs.salePrice !== undefined) document.getElementById('salePrice').value = val.inputs.salePrice;
+              if (val.inputs.existingLoan !== undefined) document.getElementById('existingLoan').value = val.inputs.existingLoan;
+              if (val.inputs.newLoan !== undefined) document.getElementById('newLoan').value = val.inputs.newLoan;
+              if (val.inputs.loanYears !== undefined) document.getElementById('loanYears').value = val.inputs.loanYears;
+              if (val.inputs.interestRate !== undefined) document.getElementById('interestRate').value = val.inputs.interestRate;
+            }
+            // 2. 상환 방식
+            if (val.method) {
+              setRepaymentMethod(val.method);
+            }
+            // 3. 취득세 옵션
+            if (val.tax) {
+              if (val.tax.newborn !== undefined) {
+                isNewbornDeduction = val.tax.newborn;
+                document.getElementById('taxNewbornCheck').checked = isNewbornDeduction;
+              }
+              if (val.tax.under85 !== undefined) {
+                isUnder85 = val.tax.under85;
+                document.getElementById('taxUnder85Check').checked = isUnder85;
+              }
+            }
+            // 4. 보유 자금 리스트
+            if (val.savings && Array.isArray(val.savings)) {
+              savingsItems = val.savings;
+              renderSavings();
+            }
+            // 5. 프리셋 리스트
+            if (val.presets && Array.isArray(val.presets)) {
+              presetItems = val.presets;
+              renderPresets();
+            }
+
+            calculate();
+            showToast('다른 기기에서 수정한 내용이 실시간 동기화되었습니다.');
+          } finally {
+            setTimeout(() => { isRemoteUpdate = false; }, 300);
+          }
+        });
+
+        console.log('[Firebase] 실시간 클라우드 DB 연동 완료');
+      } catch (err) {
+        console.warn('[Firebase] 연동 오류:', err);
+        setCloudStatus('offline', '연동 실패');
+      }
+    }
+
+    // 내 화면에서 수정 시 Firebase 클라우드 DB로 자동 전송 (디바운스 400ms)
+    function syncToCloud() {
+      if (!fbRef || isRemoteUpdate) return;
+      setCloudStatus('syncing', '클라우드 저장중');
+
+      if (cloudDebounceTimer) clearTimeout(cloudDebounceTimer);
+      cloudDebounceTimer = setTimeout(() => {
+        try {
+          const payload = {
+            updatedAt: Date.now(),
+            inputs: {
+              salePrice: value('salePrice'),
+              existingLoan: value('existingLoan'),
+              newLoan: value('newLoan'),
+              loanYears: value('loanYears'),
+              interestRate: parseFloat(document.getElementById('interestRate').value) || 3.3
+            },
+            method: currentRepaymentMethod,
+            tax: {
+              newborn: isNewbornDeduction,
+              under85: isUnder85
+            },
+            savings: savingsItems,
+            presets: presetItems
+          };
+
+          fbRef.set(payload, (error) => {
+            if (error) {
+              console.warn('[Firebase] 저장 실패:', error);
+              setCloudStatus('offline', '저장 실패');
+            } else {
+              setCloudStatus('online', '방금 저장됨');
+              setTimeout(() => { setCloudStatus('online', '실시간 동기화'); }, 2000);
+            }
+          });
+        } catch (e) {
+          console.warn('[Firebase 저장 에러]', e);
+        }
+      }, 400);
+    }
+  
     // 시작 루틴
     loadPresets();
     renderPresets();
@@ -3363,6 +3568,7 @@
     renderSavings();
     renderStaticSections();
     loadSavedOrDefaults();
+    initFirebaseSync();
     calculate();
   </script>
 </body>
