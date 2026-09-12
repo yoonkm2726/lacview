@@ -1698,8 +1698,8 @@
         </div>
         <div class="detail-row">
           <div class="detail-label-box">
-            <span class="detail-label-main">발코니 확장비 잔금 (90%)</span>
-            <span class="detail-label-sub">계약금 10% 기납부 완료</span>
+            <span class="detail-label-main">발코니 확장비 잔금 (80%)</span>
+            <span class="detail-label-sub">계약금+중도금 20% 기납부 완료</span>
           </div>
           <span class="detail-val" id="extraRemainDisplay">0원</span>
         </div>
@@ -2053,7 +2053,7 @@
         </div>
         <div class="calc-step-list">
           <div class="calc-step-row">
-            <span style="flex:1; min-width:0; word-break:keep-all;">• 분양 잔금 (분양가 95%+발코니 90%)</span>
+            <span style="flex:1; min-width:0; word-break:keep-all;">• 분양 잔금 (분양가 95%+발코니 80%)</span>
             <span class="calc-step-val" id="modalProcRemainPrice">0원</span>
           </div>
           <div class="calc-step-row">
@@ -2284,7 +2284,7 @@
         apartmentPrice: 70800,
         apartmentPaidPercent: 5,
         extraPrice: 2500,
-        extraPaidPercent: 10
+        extraPaidPercent: 20
       },
       costs: [
         { name: "취득세 등", note: "신생아 감면 등 가정", amount: 1021 },
@@ -2331,7 +2331,7 @@
     const PRESET_KEY = 'lakeview_calc_presets_v3';
     const CUSTOM_COSTS_KEY = 'lakeview_calc_custom_costs_v1';
 
-    // 분양 잔금 계산 (분양가 70,800만 원 중 계약금 5% 기납부, 95% 납부 필요 / 발코니 2,500만 원 중 5% 기납부, 95% 납부 필요)
+    // 분양 잔금 계산 (분양가 70,800만 원 중 계약금 5% 기납부, 95% 납부 필요 / 발코니 2,500만 원 중 계약금+중도금 20% 기납부, 80% 납부 필요)
     const paidPctApt = (CFG.contract && CFG.contract.apartmentPaidPercent) ? CFG.contract.apartmentPaidPercent : 10;
     const paidPctExtra = (CFG.contract && CFG.contract.extraPaidPercent) ? CFG.contract.extraPaidPercent : 10;
 
@@ -2374,7 +2374,7 @@
       const d = globalReportData;
 
       document.getElementById('modalProcTotalNeed').textContent = formatKoreanMoney(d.totalNeed);
-      document.getElementById('modalProcRemainPrice').textContent = formatKoreanMoney(d.remainPriceTotal) + ' (분양가 95%+발코니 90%)';
+      document.getElementById('modalProcRemainPrice').textContent = formatKoreanMoney(d.remainPriceTotal) + ' (분양가 95%+발코니 80%)';
       document.getElementById('modalProcTax').textContent = '약 ' + formatKoreanMoney(d.computedTaxManWon);
       document.getElementById('modalProcStatutory').textContent = '약 ' + d.statutoryTotalManWon + '만 원';
       document.getElementById('modalProcPresets').textContent = '약 ' + formatKoreanMoney(d.activePresetsTotal);
@@ -3450,7 +3450,7 @@
  • 월 납입액: ${d.monthlyFirst} (총이자 약 ${d.totalInterest})
 
 3. 입주 총 필요자금: ${formatKoreanMoney(d.totalNeed)}
- • 남은 분양잔금: ${formatKoreanMoney(d.remainPriceTotal)} (분양가 95%+발코니 90% 잔금)
+ • 남은 분양잔금: ${formatKoreanMoney(d.remainPriceTotal)} (분양가 95%+발코니 80% 잔금)
  • 예상 취득세: 약 ${formatKoreanMoney(d.computedTaxManWon)} (신생아 감면 ${isNewbornDeduction ? '500만 적용' : '미적용'})
  • 법정제비용: 약 ${d.statutoryTotalManWon}만 원
  • 이사/인테리어 프리셋: 약 ${formatKoreanMoney(d.activePresetsTotal)}
