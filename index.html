@@ -452,7 +452,66 @@
       padding-top: 14px;
       border-top: 1px solid var(--border);
     }
+    
+    /* 모바일 텍스트 2줄 줄바꿈 방지 및 정돈된 라벨 레이아웃 */
     .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+    .detail-val {
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+      text-align: right;
+    }
+    .detail-label-box {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      min-width: 0;
+      line-height: 1.3;
+      flex: 1;
+    }
+    .detail-label-main {
+      font-size: 13px;
+      color: var(--text-main);
+      font-weight: 600;
+      white-space: normal;
+      word-break: keep-all;
+    }
+    .detail-label-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+      white-space: normal;
+      word-break: keep-all;
+    }
+    .calc-step-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      color: var(--text-sub);
+    }
+    .calc-step-val {
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+      text-align: right;
+    }
+    .statutory-item > div:last-child {
+      white-space: nowrap !important;
+      flex-shrink: 0 !important;
+      margin-left: 10px;
+    }
+
+    .detail-row-old {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -1372,23 +1431,38 @@
 
       <div class="detail-list" style="margin-top:0; padding-top:0; border-top:none;">
         <div class="detail-row">
-          <span>기존 집 매도 순수령액 (매도가 − 기존대출)</span>
+          <div class="detail-label-box">
+            <span class="detail-label-main">기존 집 매도 순수령액</span>
+            <span class="detail-label-sub">예상 매도가 − 기존 대출 상환</span>
+          </div>
           <span class="detail-val" id="netCash">0원</span>
         </div>
         <div class="detail-row">
-          <span>내 보유 현금 & 모을 자금 합계 (성과금/저축 등)</span>
+          <div class="detail-label-box">
+            <span class="detail-label-main">보유 현금 & 모을 자금 합계</span>
+            <span class="detail-label-sub">등록된 자금 항목 전액 합산</span>
+          </div>
           <span class="detail-val" id="displayCurrentCash" style="color:#16a34a; font-weight:700;">0원</span>
         </div>
         <div class="detail-row">
-          <span>신규 주담대 실행액</span>
+          <div class="detail-label-box">
+            <span class="detail-label-main">신규 주담대 실행액</span>
+            <span class="detail-label-sub">디딤돌 / 보금자리론 등</span>
+          </div>
           <span class="detail-val" id="newLoanDisplay">0원</span>
         </div>
         <div class="detail-row total-row" style="background:var(--primary-light); padding:10px 12px; border-radius:10px; border:none;">
-          <span style="color:var(--primary-dark);">내 총 가용 자금 (순현금 + 모을자금 + 대출)</span>
+          <div class="detail-label-box">
+            <span class="detail-label-main" style="color:var(--primary-dark); font-weight:700;">내 총 가용 자금</span>
+            <span class="detail-label-sub" style="color:var(--primary);">매도 순현금 + 모을 자금 + 신규 대출</span>
+          </div>
           <span class="detail-val primary" id="availableFunds">0원</span>
         </div>
         <div class="detail-row">
-          <span>입주 시 총 필요 자금 (잔금 + 모든 부대비용)</span>
+          <div class="detail-label-box">
+            <span class="detail-label-main">입주 시 총 필요 자금</span>
+            <span class="detail-label-sub">분양잔금 + 취득세 + 모든 부대비용</span>
+          </div>
           <span class="detail-val" id="totalNeedInFlow">0원</span>
         </div>
       </div>
@@ -1523,15 +1597,24 @@
       </div>
       <div class="detail-list">
         <div class="detail-row">
-          <span>분양가 잔금 (90% 납부 필요: 중도금 60% + 입주잔금 30%)</span>
+          <div class="detail-label-box">
+            <span class="detail-label-main">분양가 잔금 (90%)</span>
+            <span class="detail-label-sub">중도금 60% + 입주잔금 30% 납부 필요</span>
+          </div>
           <span class="detail-val" id="aptRemainDisplay">0원</span>
         </div>
         <div class="detail-row">
-          <span>발코니 확장비 잔금 (90%)</span>
+          <div class="detail-label-box">
+            <span class="detail-label-main">발코니 확장비 잔금 (90%)</span>
+            <span class="detail-label-sub">계약금 10% 기납부 완료</span>
+          </div>
           <span class="detail-val" id="extraRemainDisplay">0원</span>
         </div>
         <div class="detail-row total-row" style="background:#f8fafc; padding:8px 10px; border-radius:8px;">
-          <span>분양 잔금 합계</span>
+          <div class="detail-label-box">
+            <span class="detail-label-main" style="font-weight:700;">분양 잔금 합계</span>
+            <span class="detail-label-sub">분양가 잔금 + 발코니 잔금</span>
+          </div>
           <span class="detail-val primary" id="remainPriceTotalDisplay">0원</span>
         </div>
       </div>
@@ -1728,12 +1811,18 @@
       <!-- 입주 부대비용 및 총 필요자금 총괄 정산 요약 -->
       <div style="margin-top:16px; padding-top:12px; border-top:1.5px dashed var(--border);">
         <div class="detail-row dim">
-          <span>취득세 + 법정비용 + 프리셋 + 추가비용 합계</span>
+          <div class="detail-label-box">
+            <span class="detail-label-main" style="font-size:12px;">입주 부대비용 합계</span>
+            <span class="detail-label-sub">취득세 + 법정비용 + 프리셋 + 추가비용</span>
+          </div>
           <span class="detail-val" id="allAdditionalCostsSubtotal">0원</span>
         </div>
         <div class="detail-row total-row" style="font-size:15px; margin-top:8px;">
-          <span>입주 총 필요자금 (분양잔금 + 모든 비용)</span>
-          <span class="detail-val primary" id="costsTotalNeedDisplay">0원</span>
+          <div class="detail-label-box">
+            <span class="detail-label-main" style="font-size:14px; font-weight:800; color:var(--text-main);">입주 총 필요자금</span>
+            <span class="detail-label-sub">분양잔금 + 모든 부대비용</span>
+          </div>
+          <span class="detail-val primary" id="costsTotalNeedDisplay" style="font-size:16px;">0원</span>
         </div>
       </div>
     </div>
@@ -1871,23 +1960,23 @@
         </div>
         <div class="calc-step-list">
           <div class="calc-step-row">
-            <span>• 분양 잔금 (분양가 90% + 발코니 90%)</span>
+            <span style="flex:1; min-width:0; word-break:keep-all;">• 분양 잔금 (분양가+발코니 90%)</span>
             <span class="calc-step-val" id="modalProcRemainPrice">0원</span>
           </div>
           <div class="calc-step-row">
-            <span>• 취득세 등 (법정세율 1.89%, 신생아 감면 반영)</span>
+            <span style="flex:1; min-width:0; word-break:keep-all;">• 취득세 등 (신생아 감면 반영)</span>
             <span class="calc-step-val" id="modalProcTax">0원</span>
           </div>
           <div class="calc-step-row">
-            <span>• 법정 필수 제비용 (등기법무사, 대출인지세, 선수관리비)</span>
+            <span style="flex:1; min-width:0; word-break:keep-all;">• 법정 필수 제비용 (등기, 인지세 등)</span>
             <span class="calc-step-val" id="modalProcStatutory">0원</span>
           </div>
           <div class="calc-step-row">
-            <span>• 선택한 이사 & 인테리어 프리셋</span>
+            <span style="flex:1; min-width:0; word-break:keep-all;">• 이사 & 인테리어 프리셋</span>
             <span class="calc-step-val" id="modalProcPresets">0원</span>
           </div>
           <div class="calc-step-row">
-            <span>• 직접 추가한 기타 입주 비용</span>
+            <span style="flex:1; min-width:0; word-break:keep-all;">• 직접 추가한 입주 비용</span>
             <span class="calc-step-val" id="modalProcCustomCosts">0원</span>
           </div>
         </div>
@@ -1904,11 +1993,11 @@
         </div>
         <div class="calc-step-list">
           <div class="calc-step-row">
-            <span>• 기존 집 매도 순현금 (매도가 − 기존대출)</span>
+            <span style="flex:1; min-width:0; word-break:keep-all;">• 기존 집 매도 순현금</span>
             <span class="calc-step-val" id="modalProcNetCash">0원</span>
           </div>
           <div class="calc-step-row">
-            <span>• 보유 현금 & 입주 전 모을 자금 (성과금/저축)</span>
+            <span style="flex:1; min-width:0; word-break:keep-all;">• 보유 현금 & 모을 자금</span>
             <span class="calc-step-val" id="modalProcSavings">0원</span>
           </div>
           <div class="calc-step-row">
