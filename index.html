@@ -2396,7 +2396,7 @@
           <thead>
             <tr>
               <th>회차</th>
-              <th style="text-align:right;">월 상환액</th>
+              <th id="scheduleColPayment" style="text-align:right;">월 상환액</th>
               <th style="text-align:right;">원금</th>
               <th style="text-align:right;">이자</th>
               <th style="text-align:right;">잔액</th>
@@ -3530,17 +3530,19 @@
       }
 
       if (loanScheduleViewMode === 'yearly') {
+        document.getElementById('scheduleColPayment').textContent = '월평균상환액';
         const totalYears = Math.ceil(loanScheduleData.length / 12);
         let rows = '';
         for (let y = 0; y < totalYears; y++) {
           const slice = loanScheduleData.slice(y * 12, y * 12 + 12);
           const totalPayment = slice.reduce((s, r) => s + r.payment, 0);
+          const avgMonthlyPayment = totalPayment / slice.length;
           const totalPrincipal = slice.reduce((s, r) => s + r.principalPaid, 0);
           const totalInterest = slice.reduce((s, r) => s + r.interestPaid, 0);
           const endBalance = Math.max(0, slice[slice.length - 1].balance);
           rows += '<tr>' +
             '<td>' + (y + 1) + '년차</td>' +
-            '<td style="text-align:right;">' + fmtWon(totalPayment) + '</td>' +
+            '<td style="text-align:right;">' + fmtWon(avgMonthlyPayment) + '</td>' +
             '<td style="text-align:right;">' + fmtWon(totalPrincipal) + '</td>' +
             '<td style="text-align:right; color:#e11d48;">' + fmtWon(totalInterest) + '</td>' +
             '<td style="text-align:right;">' + fmtWon(endBalance) + '</td>' +
@@ -3548,6 +3550,7 @@
         }
         tbody.innerHTML = rows;
       } else {
+        document.getElementById('scheduleColPayment').textContent = '월 상환액';
         let rows = '';
         loanScheduleData.forEach(r => {
           rows += '<tr>' +
