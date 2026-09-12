@@ -2223,21 +2223,67 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <!-- 1. 외부 데이터 설정 파일 로드 -->
-  <script>
-    // 브라우저 캐시 무력화: data.js를 항상 서버에서 최신 상태로 직접 로드
-    document.write('<script src="data.js?v=' + Date.now() + '"><\/script>');
-  </script>
+  <!-- data.js가 있으면 읽고, 없어도 index.html 단독으로 100% 정상 작동합니다 -->
+  <script src="data.js" onerror="console.log('data.js 생략됨: index.html 내장 설정 사용')"></script>
 
   <script>
-    const CFG = typeof APARTMENT_CONFIG !== 'undefined' ? APARTMENT_CONFIG : {
-      defaults: { salePrice: 60000, existingLoan: 21000, currentCash: 3000, futureSavings: 2000, newLoan: 30000, loanYears: 30, interestRate: 3.3 },
-      contract: { apartmentPrice: 70800, apartmentPaidPercent: 10, extraPrice: 2500, extraPaidPercent: 10 },
+    const CFG = (typeof APARTMENT_CONFIG !== 'undefined' && APARTMENT_CONFIG) ? APARTMENT_CONFIG : {
+      title: "라크뷰 입주 자금 & 대출 계산기",
+      subTitle: "매도가와 대출액, 모일 자금을 변경하면 실시간으로 자동 계산됩니다.",
+      defaults: {
+        salePrice: 60000,
+        existingLoan: 21000,
+        currentCash: 3000,
+        futureSavings: 2000,
+        newLoan: 30000,
+        loanYears: 30,
+        interestRate: 3.3,
+        savingsList: [
+          { id: 1, name: "현재 보유 현금/예적금", amount: 3000, category: "cash" },
+          { id: 2, name: "입주 전 급여/성과금 모을 자금", amount: 2000, category: "savings" }
+        ]
+      },
+      contract: {
+        apartmentPrice: 70800,
+        apartmentPaidPercent: 10,
+        extraPrice: 2500,
+        extraPaidPercent: 10
+      },
+      costs: [
+        { name: "취득세 등", note: "신생아 감면 등 가정", amount: 1021 },
+        { name: "시스템에어컨", note: "4대 인버터", amount: 620 },
+        { name: "법무사 · 등기 비용", note: "소유권 이전등기 등", amount: 130 },
+        { name: "이사 비용", note: "포장이사/사다리차", amount: 230 },
+        { name: "기타 입주 부대비용", note: "입주청소/줄눈 등", amount: 150 }
+      ],
       notices: [
-        "은행별 첫 회차 일수 계산, 거치기간 여부, 가산금리 변동 및 원 단위 절사에 따라 실제 청구액과 차이가 있을 수 있습니다.",
-        "취득세는 지방세법 제11조(비례세율) 및 출산가구 주택 취득세 감면(최대 500만 원 한도 공제, 2024년 이후 출산 연장 적용) 기준입니다.",
-        "소유권 이전등기 인지세는 인지세법상 1억원 초과 10억원 이하 정액 15만 원입니다."
-      ]
+        "대출 상환은 원리금균등, 원금균등, 체증식(HF디딤돌) 분할상환 방식으로 정밀 계산됩니다.",
+        "은행별 첫 회차 일수 계산, 거치기간 여부, 가산금리 변동 및 원 단위 절사에 따라 실제 청구액과 미세한 차이가 있을 수 있습니다.",
+        "취득세(약 1,021만 원)는 지방세법 제11조 및 신생아 출산가구 취득세 감면(최대 500만 원 공제, 2024~2027년 이후 출산 연장 적용) 기준입니다.",
+        "기존 주택 처분 조건부 일시적 2주택자도 3년 이내 종전자산 처분 시 신생아 감면 혜택을 동일하게 적용받을 수 있습니다."
+      ],
+      firebaseConfig: {
+        apiKey: "AIzaSyCtLucVUFBJcSXZqcU2eg2j5v65HUXsj0I",
+        authDomain: "lacview-14eaf.firebaseapp.com",
+        databaseURL: "https://lacview-14eaf-default-rtdb.firebaseio.com",
+        projectId: "lacview-14eaf",
+        storageBucket: "lacview-14eaf.firebasestorage.app",
+        messagingSenderId: "94070303919",
+        appId: "1:94070303919:web:a6aa3e25c3a1c271a8785a"
+      }
     };
+
+    if (!CFG.firebaseConfig || !CFG.firebaseConfig.apiKey) {
+      CFG.firebaseConfig = {
+        apiKey: "AIzaSyCtLucVUFBJcSXZqcU2eg2j5v65HUXsj0I",
+        authDomain: "lacview-14eaf.firebaseapp.com",
+        databaseURL: "https://lacview-14eaf-default-rtdb.firebaseio.com",
+        projectId: "lacview-14eaf",
+        storageBucket: "lacview-14eaf.firebasestorage.app",
+        messagingSenderId: "94070303919",
+        appId: "1:94070303919:web:a6aa3e25c3a1c271a8785a"
+      };
+    }
 
     const STORAGE_KEY = 'lakeview_calc_user_inputs_v2';
     const CFG_VERSION_KEY = 'lakeview_calc_synced_cfg_version';
@@ -2956,21 +3002,7 @@
     }
 
     function loadSavedOrDefaults() {
-      // 서버 data.js 파일의 버전이 변경되었거나 깃허브에서 직접 수정된 경우, 로컬 캐시를 초기화하고 서버 원본 데이터로 자동 동기화
-      try {
-        const lastSyncedVer = localStorage.getItem(CFG_VERSION_KEY);
-        if (CFG.version && lastSyncedVer !== String(CFG.version)) {
-          console.log('[동기화] 서버 data.js 최신 버전 감지:', CFG.version);
-          localStorage.removeItem(STORAGE_KEY);
-          localStorage.removeItem(SAVINGS_KEY);
-          localStorage.removeItem(PRESET_KEY);
-          localStorage.removeItem(CUSTOM_COSTS_KEY);
-          localStorage.setItem(CFG_VERSION_KEY, String(CFG.version));
-          setTimeout(() => {
-            showToast('서버의 최신 data.js 설정이 자동으로 반영되었습니다.');
-          }, 400);
-        }
-      } catch(e) {}
+      // Firebase 클라우드 DB가 최우선으로 데이터를 보존합니다
       let saved = null;
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -3477,6 +3509,11 @@
               if (val.inputs.newLoan !== undefined) document.getElementById('newLoan').value = val.inputs.newLoan;
               if (val.inputs.loanYears !== undefined) document.getElementById('loanYears').value = val.inputs.loanYears;
               if (val.inputs.interestRate !== undefined) document.getElementById('interestRate').value = val.inputs.interestRate;
+              
+              // 다음번 첫 접속 시 깜빡임 없이 즉시 뜨도록 로컬스토리지에도 즉시 저장
+              try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(val.inputs));
+              } catch(e) {}
             }
             // 2. 상환 방식
             if (val.method) {
@@ -3497,6 +3534,7 @@
             if (val.savings && Array.isArray(val.savings)) {
               savingsItems = val.savings;
               renderSavings();
+              try { localStorage.setItem(SAVINGS_KEY, JSON.stringify(savingsItems)); } catch(e) {}
             }
             // 5. 프리셋 리스트
             if (val.presets && Array.isArray(val.presets)) {
