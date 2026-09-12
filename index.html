@@ -1969,6 +1969,20 @@
           </div>
           <div style="font-weight:700; color:var(--primary); font-size:14px;">35만 원</div>
         </div>
+        <div class="statutory-item">
+          <div>
+            <div style="font-weight:700; color:var(--text-main);">부동산 중개수수료 (현재 집 매도)</div>
+            <div style="font-size:11px; color:var(--text-muted);" id="saleBrokerFeeNote">매도가 기준 상한요율 적용</div>
+          </div>
+          <div style="font-weight:700; color:var(--primary); font-size:14px;" id="saleBrokerFeeDisplay">0만 원</div>
+        </div>
+        <div class="statutory-item" id="loanPayoffFeeRow" style="display:none;">
+          <div>
+            <div style="font-weight:700; color:var(--text-main);">근저당권 말소비용 (기존 대출)</div>
+            <div style="font-size:11px; color:var(--text-muted);">등록면허세 + 말소등기 법무사 보수 개략치</div>
+          </div>
+          <div style="font-weight:700; color:var(--primary); font-size:14px;" id="loanPayoffFeeDisplay">0만 원</div>
+        </div>
       </div>
       <div class="detail-row" style="background:var(--surface); padding:8px 10px; border-radius:8px;">
         <span style="font-weight:600;">법정 제비용 소계</span>
@@ -2453,7 +2467,8 @@
         "대출 상환은 원리금균등, 원금균등, 체증식(HF디딤돌) 분할상환 방식으로 정밀 계산됩니다.",
         "은행별 첫 회차 일수 계산, 거치기간 여부, 가산금리 변동 및 원 단위 절사에 따라 실제 청구액과 미세한 차이가 있을 수 있습니다.",
         "취득세(약 1,021만 원)는 지방세법 제11조 및 신생아 출산가구 취득세 감면(최대 500만 원 공제, 2024~2027년 이후 출산 연장 적용) 기준입니다.",
-        "기존 주택 처분 조건부 일시적 2주택자도 3년 이내 종전자산 처분 시 신생아 감면 혜택을 동일하게 적용받을 수 있습니다."
+        "기존 주택 처분 조건부 일시적 2주택자도 3년 이내 종전자산 처분 시 신생아 감면 혜택을 동일하게 적용받을 수 있습니다.",
+        "현재 집 매도 중개수수료는 매도가 구간별 법정 상한요율로 자동 계산되며, 실제로는 중개사와 협의해 상한요율보다 낮게 책정될 수 있습니다. 근저당권 말소비용은 등록면허세·법무사 보수를 합한 개략치입니다."
       ],
       firebaseConfig: {
         apiKey: "AIzaSyCtLucVUFBJcSXZqcU2eg2j5v65HUXsj0I",
@@ -2884,8 +2899,8 @@
       document.getElementById('newbornTaxModal').classList.remove('active');
     }
 
-    // ⚖️ 법정 제비용 자동 계산 (대출 인지세는 대출금액에 따라 자동 변동)
-    function calculateStatutoryFees(newLoanManWon) {
+    // ⚖️ 법정 제비용 자동 계산 (대출 인지세 + 매도 중개수수료 + 근저당 말소비용까지 실시간 연동)
+    function calculateStatutoryFees(newLoanManWon, salePriceManWon, existingLoanManWon) {
       let loanStampDuty = 7.5; // 만 원 (1억 초과 시 15만원의 50%)
       if (newLoanManWon <= 5000) {
         loanStampDuty = 0;
@@ -2900,7 +2915,38 @@
 
       const lawyerFee = 130; // 소유권이전 법무사보수 및 법정인지세 15만
       const maintenanceFee = 35; // 선수관리비 35만
-      statutoryTotalManWon = lawyerFee + loanStampDuty + maintenanceFee;
+
+      // 🏠 현재 집 매도 중개수수료 (공인중개사법 시행규칙 - 주택 매매 상한요율)
+      let brokerRatePercent = 0.4;
+      let brokerRateLabel = '0.4%';
+      const priceEok = salePriceManWon / 10000; // 억 단위
+      if (priceEok < 0.5) { brokerRatePercent = 0.6; brokerRateLabel = '0.6%(한도 25만원)'; }
+      else if (priceEok < 2) { brokerRatePercent = 0.5; brokerRateLabel = '0.5%(한도 80만원)'; }
+      else if (priceEok < 9) { brokerRatePercent = 0.4; brokerRateLabel = '0.4%'; }
+      else if (priceEok < 12) { brokerRatePercent = 0.5; brokerRateLabel = '0.5%'; }
+      else if (priceEok < 15) { brokerRatePercent = 0.6; brokerRateLabel = '0.6%'; }
+      else { brokerRatePercent = 0.7; brokerRateLabel = '0.7%'; }
+
+      let saleBrokerFee = salePriceManWon > 0 ? salePriceManWon * (brokerRatePercent / 100) : 0;
+      // 상한요율 구간의 정액 한도 적용 (5천만원 미만/2억 미만 구간)
+      if (salePriceManWon > 0 && priceEok < 0.5) saleBrokerFee = Math.min(saleBrokerFee, 25);
+      if (salePriceManWon > 0 && priceEok >= 0.5 && priceEok < 2) saleBrokerFee = Math.min(saleBrokerFee, 80);
+
+      document.getElementById('saleBrokerFeeDisplay').textContent = saleBrokerFee > 0 ? saleBrokerFee.toFixed(1) + '만 원' : '0만 원';
+      document.getElementById('saleBrokerFeeNote').textContent = `매도가 ${formatKoreanMoney(salePriceManWon)} × 상한요율 ${brokerRateLabel}`;
+
+      // 🔓 근저당권 말소비용 (기존 대출이 있을 때만 발생 - 등록면허세+법무사 말소보수 개략치)
+      const loanPayoffFeeRow = document.getElementById('loanPayoffFeeRow');
+      let loanPayoffFee = 0;
+      if (existingLoanManWon > 0) {
+        loanPayoffFee = 6; // 만 원 (등록면허세 0.36만+말소 법무사보수 약 5.6만 개략치)
+        loanPayoffFeeRow.style.display = '';
+        document.getElementById('loanPayoffFeeDisplay').textContent = loanPayoffFee + '만 원';
+      } else {
+        loanPayoffFeeRow.style.display = 'none';
+      }
+
+      statutoryTotalManWon = lawyerFee + loanStampDuty + maintenanceFee + saleBrokerFee + loanPayoffFee;
 
       document.getElementById('statutoryTotalDisplay').textContent = statutoryTotalManWon.toFixed(1) + '만 원';
     }
@@ -3578,8 +3624,8 @@
       // 1. 취득세 자동 계산
       calculateAcquisitionTax();
 
-      // 2. 법정 제비용 자동 계산 (대출금에 따른 인지세 연동)
-      calculateStatutoryFees(newLoan);
+      // 2. 법정 제비용 자동 계산 (대출금에 따른 인지세 + 매도 관련 비용 연동)
+      calculateStatutoryFees(newLoan, salePrice, existingLoan);
 
       // 3. 프리셋 선택된 항목 합계
       const activePresetsTotal = presetItems
