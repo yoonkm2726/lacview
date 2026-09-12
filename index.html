@@ -684,11 +684,11 @@
     /* 📅 대출 상환 스케줄 표 전용 - 좁은 화면에서도 좌우 스크롤 없이 표시 */
     .schedule-table {
       table-layout: fixed;
-      font-size: 10.5px;
+      font-size: 9.5px;
     }
     .schedule-table th,
     .schedule-table td {
-      padding: 6px 3px;
+      padding: 5px 2px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -2429,11 +2429,11 @@
         <table class="table-box schedule-table">
           <thead>
             <tr>
-              <th style="width:16%;">회차</th>
-              <th id="scheduleColPayment" style="width:21%; text-align:right;">월 상환액</th>
-              <th style="width:21%; text-align:right;">원금</th>
-              <th style="width:21%; text-align:right;">이자</th>
-              <th style="width:21%; text-align:right;">잔액</th>
+              <th style="width:13%;">회차</th>
+              <th id="scheduleColPayment" style="width:21.75%; text-align:right;">월 상환액</th>
+              <th style="width:21.75%; text-align:right;">원금</th>
+              <th style="width:21.75%; text-align:right;">이자</th>
+              <th style="width:21.75%; text-align:right;">잔액</th>
             </tr>
           </thead>
           <tbody id="loanScheduleTableBody"></tbody>
@@ -3603,16 +3603,6 @@
       mBtn.setAttribute('style', loanScheduleViewMode === 'monthly' ? activeStyle : inactiveStyle);
     }
 
-    // 📏 스케줄 표 전용 압축 금액 표기 (좁은 열 폭에 맞게 "만원"/"억" 단위로 축약)
-    function fmtScheduleWon(won) {
-      const man = won / 10000;
-      if (Math.abs(man) >= 10000) {
-        const eok = man / 10000;
-        return eok.toFixed(2).replace(/\.?0+$/, '') + '억';
-      }
-      return Math.round(man).toLocaleString('ko-KR') + '만';
-    }
-
     function renderLoanScheduleTable() {
       const tbody = document.getElementById('loanScheduleTableBody');
       if (!tbody) return;
@@ -3635,10 +3625,10 @@
           const endBalance = Math.max(0, slice[slice.length - 1].balance);
           rows += '<tr>' +
             '<td>' + (y + 1) + '년차</td>' +
-            '<td style="text-align:right;">' + fmtScheduleWon(avgMonthlyPayment) + '</td>' +
-            '<td style="text-align:right;">' + fmtScheduleWon(totalPrincipal) + '</td>' +
-            '<td style="text-align:right; color:#e11d48;">' + fmtScheduleWon(totalInterest) + '</td>' +
-            '<td style="text-align:right;">' + fmtScheduleWon(endBalance) + '</td>' +
+            '<td style="text-align:right;">' + fmtWon(avgMonthlyPayment) + '</td>' +
+            '<td style="text-align:right;">' + fmtWon(totalPrincipal) + '</td>' +
+            '<td style="text-align:right; color:#e11d48;">' + fmtWon(totalInterest) + '</td>' +
+            '<td style="text-align:right;">' + fmtWon(endBalance) + '</td>' +
             '</tr>';
         }
         tbody.innerHTML = rows;
@@ -3648,10 +3638,10 @@
         loanScheduleData.forEach(r => {
           rows += '<tr>' +
             '<td>' + r.month + '회</td>' +
-            '<td style="text-align:right;">' + fmtScheduleWon(r.payment) + '</td>' +
-            '<td style="text-align:right;">' + fmtScheduleWon(r.principalPaid) + '</td>' +
-            '<td style="text-align:right; color:#e11d48;">' + fmtScheduleWon(r.interestPaid) + '</td>' +
-            '<td style="text-align:right;">' + fmtScheduleWon(Math.max(0, r.balance)) + '</td>' +
+            '<td style="text-align:right;">' + fmtWon(r.payment) + '</td>' +
+            '<td style="text-align:right;">' + fmtWon(r.principalPaid) + '</td>' +
+            '<td style="text-align:right; color:#e11d48;">' + fmtWon(r.interestPaid) + '</td>' +
+            '<td style="text-align:right;">' + fmtWon(Math.max(0, r.balance)) + '</td>' +
             '</tr>';
         });
         tbody.innerHTML = rows;
