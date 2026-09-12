@@ -1669,7 +1669,7 @@
       <ul class="info-list">
         <li><strong>원리금균등</strong>: 매달 통장에서 나가는 금액이 같아 매월 생활비 예산 관리에 가장 유리합니다.</li>
         <li><strong>원금균등</strong>: 매달 원금을 동일하게 갚아 대출 잔액이 가장 빨리 줄며, <strong>총 이자가 3가지 중 가장 적습니다</strong>.</li>
-        <li><strong>체증식(HF디딤돌)</strong>: 초기 월 상환액을 최소화하고 매년 조금씩 늘어나는 방식으로, <strong>초기 자금이 빠듯한 청년·신생아 신혼부부</strong>에게 인기가 많습니다.</li>
+        <li><strong>체증식(HF디딤돌)</strong>: 초기 월 상환액을 최소화하고 매년 조금씩 늘어나는 방식으로, <strong>초기 자금이 빠듯한 청년·신혼부부</strong>에게 인기가 많습니다.</li>
       </ul>
     </div>
   </div>
@@ -3493,6 +3493,7 @@
     let fbRef = null;
     let isRemoteUpdate = false;
     let cloudDebounceTimer = null;
+    let initialCloudLoadComplete = false;
 
     function setCloudStatus(state, label) {
       const badge = document.getElementById('cloudSyncBadge');
@@ -3630,12 +3631,14 @@
 
       if (!cfg || !cfg.apiKey || cfg.apiKey.trim() === '') {
         if (badge) badge.title = 'Firebase 연동 키가 없어 로컬 모드로 동작합니다.';
+        initialCloudLoadComplete = true;
         return;
       }
 
       try {
         if (typeof firebase === 'undefined') {
           console.warn('[Firebase] SDK가 로드되지 않았습니다.');
+          initialCloudLoadComplete = true;
           return;
         }
         if (!firebase.apps.length) {
@@ -3653,26 +3656,38 @@
           }
         });
 
-        // 구글 서버 실시간 리스너: 어디서든 접속 시 구글 서버 최신 데이터를 1순위로 즉시 로드
-        fbRef.on('value', (snapshot) => {
+        // ✅ 최초 1회는 클라우드 값을 먼저 읽어온 뒤에만 실시간 동기화를 켠다
+        fbRef.once('value').then((snapshot) => {
           const val = snapshot.val();
-          if (!val) return;
-          if (isRemoteUpdate) return;
-          console.log('[Firebase] 구글 서버 최신 데이터 수신 및 적용:', val);
-          applyCloudDataToUI(val);
-          setCloudStatus('online', '실시간 동기화');
+          if (val) {
+            console.log('[Firebase] 최초 클라우드 데이터 적용:', val);
+            applyCloudDataToUI(val);
+          }
+          initialCloudLoadComplete = true;
+
+          fbRef.on('value', (snapshot2) => {
+            const val2 = snapshot2.val();
+            if (!val2) return;
+            if (isRemoteUpdate) return;
+            applyCloudDataToUI(val2);
+            setCloudStatus('online', '실시간 동기화');
+          });
+        }).catch((err) => {
+          console.warn('[Firebase] 최초 로드 실패:', err);
+          initialCloudLoadComplete = true;
         });
 
         console.log('[Firebase] 실시간 클라우드 DB 연동 완료');
       } catch (err) {
         console.warn('[Firebase] 연동 오류:', err);
         setCloudStatus('offline', '연동 실패');
+        initialCloudLoadComplete = true;
       }
     }
 
     // 내 화면에서 수정 시 Firebase 클라우드 DB로 자동 전송 (디바운스 400ms)
     function syncToCloud() {
-      if (!fbRef || isRemoteUpdate) return;
+      if (!fbRef || isRemoteUpdate || !initialCloudLoadComplete) return;
       setCloudStatus('syncing', '클라우드 저장중');
 
       if (cloudDebounceTimer) clearTimeout(cloudDebounceTimer);
