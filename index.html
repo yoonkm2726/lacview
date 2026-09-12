@@ -8,6 +8,29 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
   <style>
     :root {
+      /* 🌙 다크모드 (기본값) */
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --primary-light: #16213a;
+      --accent-shortage: #fb923c;
+      --accent-shortage-bg: #2a1b0e;
+      --accent-surplus: #4ade80;
+      --accent-surplus-bg: #112318;
+      --bg: #0b1220;
+      --card-bg: #141c2e;
+      --surface: #0f1728;
+      --surface-alt: #1b2740;
+      --text-main: #e8ecf3;
+      --text-sub: #b7c2d6;
+      --text-muted: #8794ac;
+      --border: #2c3a56;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -1px rgba(0, 0, 0, 0.35);
+    }
+
+    /* ☀️ 라이트모드 (토글 시 적용) */
+    :root[data-theme="light"] {
       --primary: #2563eb;
       --primary-dark: #1d4ed8;
       --primary-light: #eff6ff;
@@ -17,12 +40,12 @@
       --accent-surplus-bg: #f0fdf4;
       --bg: #f8fafc;
       --card-bg: #ffffff;
+      --surface: #f8fafc;
+      --surface-alt: #f1f5f9;
       --text-main: #0f172a;
       --text-sub: #475569;
       --text-muted: #94a3b8;
       --border: #e2e8f0;
-      --radius: 16px;
-      --radius-sm: 10px;
       --shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
 
@@ -95,7 +118,7 @@
       gap: 6px;
     }
     .top-btn {
-      background: #ffffff;
+      background: var(--card-bg);
       border: 1px solid var(--border);
       color: var(--text-sub);
       padding: 5px 10px;
@@ -111,7 +134,7 @@
       font-family: inherit;
     }
     .top-btn:active {
-      background: #f1f5f9;
+      background: var(--surface-alt);
       transform: scale(0.96);
     }
     .top-btn.primary {
@@ -270,7 +293,7 @@
       background: rgba(255, 255, 255, 0.3);
     }
     .calc-step-card {
-      background: #f8fafc;
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 14px 12px;
@@ -437,7 +460,7 @@
       font-size: 16px;
       font-weight: 600;
       color: var(--text-main);
-      background: #ffffff;
+      background: var(--card-bg);
       border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
       outline: none;
@@ -468,7 +491,7 @@
     }
     .chips-row::-webkit-scrollbar { display: none; }
     .chip-btn {
-      background: #f1f5f9;
+      background: var(--surface-alt);
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 6px 9px;
@@ -493,7 +516,7 @@
       grid-template-columns: 1fr 1fr 1fr;
       gap: 6px;
       margin-bottom: 16px;
-      background: #f1f5f9;
+      background: var(--surface-alt);
       padding: 4px;
       border-radius: 12px;
     }
@@ -519,7 +542,7 @@
       color: var(--text-muted);
     }
     .method-btn.active {
-      background: #ffffff;
+      background: var(--card-bg);
       color: var(--primary);
       font-weight: 700;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -623,7 +646,7 @@
 
     /* 공식 및 팁 박스 */
     .formula-box {
-      background: #f8fafc;
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       padding: 12px 14px;
@@ -640,7 +663,7 @@
       text-align: left;
     }
     .table-box th {
-      background: #f8fafc;
+      background: var(--surface);
       color: var(--text-sub);
       font-weight: 600;
       padding: 8px 10px;
@@ -648,7 +671,7 @@
     }
     .table-box td {
       padding: 10px 10px;
-      border-bottom: 1px solid #f1f5f9;
+      border-bottom: 1px solid var(--border);
       color: var(--text-main);
     }
     .table-box tr:last-child td { border-bottom: none; }
@@ -660,8 +683,8 @@
 
     /* 🏛️ 취득세 전용 인터랙티브 박스 */
     .tax-box {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
+      background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 14px;
     }
@@ -702,9 +725,9 @@
     }
     .tax-law-note {
       font-size: 11px;
-      color: #64748b;
+      color: var(--text-sub);
       line-height: 1.55;
-      background: #ffffff;
+      background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 10px;
@@ -744,9 +767,9 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 12px;
-      background: #f8fafc;
+      background: var(--surface);
       border-radius: 10px;
-      border: 1px solid #f1f5f9;
+      border: 1px solid var(--border);
       font-size: 12px;
     }
 
@@ -759,7 +782,7 @@
     }
     .preset-card {
       border: 1.5px solid var(--border);
-      background: #ffffff;
+      background: var(--card-bg);
       border-radius: 12px;
       padding: 12px 10px;
       cursor: pointer;
@@ -775,7 +798,7 @@
     }
     .preset-card.active {
       border-color: var(--primary);
-      background: #f0f7ff;
+      background: var(--primary-light);
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
     }
     .preset-top {
@@ -797,8 +820,8 @@
       width: 22px;
       height: 22px;
       border-radius: 6px;
-      background: #f1f5f9;
-      color: #475569;
+      background: var(--surface-alt);
+      color: var(--text-sub);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -813,11 +836,11 @@
       width: 18px;
       height: 18px;
       border-radius: 50%;
-      border: 1.5px solid #cbd5e1;
+      border: 1.5px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #ffffff;
+      background: var(--card-bg);
       flex-shrink: 0;
       transition: all 0.2s ease;
     }
@@ -857,7 +880,7 @@
       color: var(--primary);
     }
     .preset-edit-btn {
-      background: #ffffff;
+      background: var(--card-bg);
       border: 1px solid var(--border);
       color: var(--text-sub);
       padding: 3px 7px;
@@ -872,13 +895,13 @@
       font-family: inherit;
     }
     .preset-card.active .preset-edit-btn {
-      background: rgba(255, 255, 255, 0.9);
+      background: var(--card-bg);
       border-color: rgba(37, 99, 235, 0.3);
       color: var(--primary);
     }
     .preset-edit-btn:active {
       transform: scale(0.92);
-      background: #f1f5f9;
+      background: var(--surface-alt);
     }
 
     
@@ -888,7 +911,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 11px 13px;
-      background: #ffffff;
+      background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 12px;
       margin-bottom: 8px;
@@ -949,7 +972,7 @@
       gap: 5px;
     }
     .fund-action-pill {
-      background: #f8fafc;
+      background: var(--surface);
       border: 1px solid var(--border);
       color: var(--text-sub);
       padding: 4px 8px;
@@ -964,11 +987,11 @@
       font-family: inherit;
     }
     .fund-action-pill:hover {
-      background: #f1f5f9;
+      background: var(--surface-alt);
       color: var(--text-main);
     }
     .fund-action-pill.delete {
-      color: #94a3b8;
+      color: var(--text-muted);
     }
     .fund-action-pill.delete:hover {
       color: #ef4444;
@@ -985,7 +1008,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 10px 12px;
-      background: #f8fafc;
+      background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
       margin-bottom: 8px;
@@ -1009,7 +1032,7 @@
       gap: 6px;
     }
     .action-btn {
-      background: #ffffff;
+      background: var(--card-bg);
       border: 1px solid var(--border);
       color: var(--text-sub);
       padding: 5px 8px;
@@ -1028,7 +1051,7 @@
       border-color: #fecaca;
     }
     .action-btn:active {
-      background: #f1f5f9;
+      background: var(--surface-alt);
       transform: scale(0.96);
     }
 
@@ -1057,7 +1080,7 @@
     .modal-card {
       width: 100%;
       max-width: 500px;
-      background: #ffffff;
+      background: var(--card-bg);
       border-radius: 20px 20px 0 0;
       padding: 22px 20px calc(24px + env(safe-area-inset-bottom, 0px));
       box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
@@ -1084,7 +1107,7 @@
       gap: 6px;
     }
     .modal-close-btn {
-      background: #f1f5f9;
+      background: var(--surface-alt);
       border: none;
       width: 32px;
       height: 32px;
@@ -1097,7 +1120,7 @@
       transition: all 0.15s ease;
     }
     .modal-close-btn:active {
-      background: #e2e8f0;
+      background: var(--border);
       transform: scale(0.92);
     }
     .modal-actions {
@@ -1107,7 +1130,7 @@
       margin-top: 20px;
     }
     .modal-btn-cancel {
-      background: #f1f5f9;
+      background: var(--surface-alt);
       border: none;
       height: 48px;
       border-radius: 12px;
@@ -1280,12 +1303,12 @@
       align-items: center;
       gap: 5px;
       padding: 3px 8px;
-      background: #f1f5f9;
+      background: var(--surface-alt);
       border-radius: 999px;
       font-size: 11px;
       font-weight: 600;
-      color: #64748b;
-      border: 1px solid #e2e8f0;
+      color: var(--text-sub);
+      border: 1px solid var(--border);
       transition: all 0.2s ease;
       white-space: nowrap;
     }
@@ -1303,7 +1326,7 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #94a3b8;
+      background: var(--text-muted);
       display: inline-block;
     }
     .cloud-dot.online {
@@ -1336,6 +1359,17 @@
     }
   
   </style>
+  <script>
+    // 🌙 다크모드가 기본값 - 저장된 설정이 'light'일 때만 라이트모드로 전환 (깜빡임 방지)
+    (function () {
+      try {
+        var t = localStorage.getItem('lakeview_calc_theme');
+        if (t === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
 
@@ -1356,6 +1390,10 @@
         <span class="cloud-dot" id="cloudDot"></span>
         <span id="cloudStatusText">연결중</span>
       </div>
+      <button type="button" class="top-btn" id="themeToggleBtn" onclick="toggleTheme()" title="다크/라이트 모드 전환">
+        <span id="themeToggleIcon">🌙</span>
+        <span id="themeToggleLabel">다크</span>
+      </button>
       <button type="button" class="top-btn btn-cloud-save" onclick="manualSaveToCloud()" title="현재 입력값을 구글 서버에 영구 저장합니다">
         <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
         서버 저장
@@ -1711,15 +1749,15 @@
           시점별 예상 월 납부액 흐름
         </span>
         <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
-          <div style="background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:8px 6px; text-align:center;">
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px 6px; text-align:center;">
             <div style="font-size:10px; color:var(--text-sub);">1회차 (초기)</div>
             <div style="font-size:12px; font-weight:700; color:var(--primary); margin-top:2px;" id="flow1st">0원</div>
           </div>
-          <div style="background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:8px 6px; text-align:center;">
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px 6px; text-align:center;">
             <div style="font-size:10px; color:var(--text-sub);">10년차 (중간)</div>
             <div style="font-size:12px; font-weight:700; color:var(--text-main); margin-top:2px;" id="flow10th">0원</div>
           </div>
-          <div style="background:#f8fafc; border:1px solid var(--border); border-radius:8px; padding:8px 6px; text-align:center;">
+          <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px 6px; text-align:center;">
             <div style="font-size:10px; color:var(--text-sub);">만기 회차</div>
             <div style="font-size:12px; font-weight:700; color:var(--text-main); margin-top:2px;" id="flowEnd">0원</div>
           </div>
@@ -1780,7 +1818,7 @@
           </div>
           <span class="detail-val" id="extraRemainDisplay">0원</span>
         </div>
-        <div class="detail-row total-row" style="background:#f8fafc; padding:8px 10px; border-radius:8px;">
+        <div class="detail-row total-row" style="background:var(--surface); padding:8px 10px; border-radius:8px;">
           <div class="detail-label-box">
             <span class="detail-label-main" style="font-weight:700;">분양 잔금 합계</span>
             <span class="detail-label-sub">분양가 잔금 + 발코니 잔금</span>
@@ -1832,39 +1870,39 @@
         </label>
 
         <!-- 📑 취득세 법정 세부 산출 명세서 (Worksheet) -->
-        <div style="margin-top:10px; background:#ffffff; border:1px solid var(--border); border-radius:10px; overflow:hidden;">
-          <div style="background:#f1f5f9; padding:8px 12px; font-size:12px; font-weight:700; color:var(--text-main); display:flex; justify-content:space-between; align-items:center;">
+        <div style="margin-top:10px; background:var(--card-bg); border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+          <div style="background:var(--surface-alt); padding:8px 12px; font-size:12px; font-weight:700; color:var(--text-main); display:flex; justify-content:space-between; align-items:center;">
             <span>📑 법정 취득세 세부 산출 내역</span>
             <span style="font-size:11px; color:var(--primary); font-weight:600;" id="taxRateFormulaBadge">비례세율 1.8867%</span>
           </div>
           <table style="width:100%; border-collapse:collapse; font-size:11.5px;">
             <tbody>
-              <tr style="border-bottom:1px solid #f1f5f9;">
+              <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:8px 10px; color:var(--text-sub);">과세표준 (분양가+발코니)</td>
                 <td style="padding:8px 10px; text-align:right; font-weight:700;" id="taxBasePriceDisplay">733,000,000원</td>
               </tr>
-              <tr style="border-bottom:1px solid #f1f5f9;">
+              <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:8px 10px; color:var(--text-sub);">
                   ① 취득세 (본세)
                   <span style="font-size:10px; color:var(--text-muted); display:block;" id="taxBaseRateCalcNote">7.33억 × 1.8867%</span>
                 </td>
                 <td style="padding:8px 10px; text-align:right; font-weight:700; color:var(--text-main);" id="taxBaseAmountDisplay">13,829,330원</td>
               </tr>
-              <tr style="border-bottom:1px solid #f1f5f9;">
+              <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:8px 10px; color:var(--text-sub);">
                   ② 지방교육세
                   <span style="font-size:10px; color:var(--text-muted); display:block;">본세의 10% (0.1887%)</span>
                 </td>
                 <td style="padding:8px 10px; text-align:right; font-weight:700; color:var(--text-main);" id="taxEduAmountDisplay">1,382,930원</td>
               </tr>
-              <tr style="border-bottom:1px solid #f1f5f9;">
+              <tr style="border-bottom:1px solid var(--border);">
                 <td style="padding:8px 10px; color:var(--text-sub);">
                   ③ 농어촌특별세
                   <span style="font-size:10px; color:var(--text-muted); display:block;" id="taxRuralNote">85㎡ 이하 비과세</span>
                 </td>
                 <td style="padding:8px 10px; text-align:right; font-weight:700; color:var(--text-main);" id="taxRuralAmountDisplay">0원</td>
               </tr>
-              <tr style="background:#fafafa; border-bottom:1px dashed #e2e8f0;">
+              <tr style="background:var(--surface); border-bottom:1px dashed var(--border);">
                 <td style="padding:8px 10px; font-weight:600; color:var(--text-sub);">산출세액 합계 (감면 전)</td>
                 <td style="padding:8px 10px; text-align:right; font-weight:700; color:var(--text-main);" id="taxBeforeDiscountDisplay">15,212,260원</td>
               </tr>
@@ -1885,7 +1923,7 @@
 
         <!-- 💡 왜 단순 %가 아닌가요? 법적 산식 설명 -->
         <div class="tax-law-note" id="taxBreakdownNote">
-          <div style="font-weight:700; color:#0f172a; margin-bottom:4px; display:flex; align-items:center; gap:4px;">
+          <div style="font-weight:700; color:var(--text-main); margin-bottom:4px; display:flex; align-items:center; gap:4px;">
             <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
             취득세 세율 산정 공식 안내 (지방세법 제11조)
           </div>
@@ -1932,7 +1970,7 @@
           <div style="font-weight:700; color:var(--primary); font-size:14px;">35만 원</div>
         </div>
       </div>
-      <div class="detail-row" style="background:#f8fafc; padding:8px 10px; border-radius:8px;">
+      <div class="detail-row" style="background:var(--surface); padding:8px 10px; border-radius:8px;">
         <span style="font-weight:600;">법정 제비용 소계</span>
         <span class="detail-val primary" id="statutoryTotalDisplay">172.5만 원</span>
       </div>
@@ -2178,13 +2216,13 @@
       </div>
 
       <!-- 3단계: 최종 정산 공식 및 판정 -->
-      <div class="calc-step-card" style="background:#ffffff; border:1.5px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+      <div class="calc-step-card" style="background:var(--card-bg); border:1.5px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,0.04);">
         <div class="calc-step-title" style="margin-bottom:10px;">
           <span>3. 최종 자금 과부족 결산</span>
           <span id="modalProcFinalTag" style="font-size:11px; padding:2px 8px; border-radius:6px; font-weight:700;">계산 중</span>
         </div>
         
-        <div style="background:#f8fafc; padding:10px; border-radius:8px; font-size:12px; line-height:1.6; margin-bottom:10px;" id="modalProcFormulaDetails">
+        <div style="background:var(--surface); padding:10px; border-radius:8px; font-size:12px; line-height:1.6; margin-bottom:10px;" id="modalProcFormulaDetails">
           <!-- JS로 동적 상세 계산식 표시 -->
         </div>
 
@@ -2195,7 +2233,7 @@
       </div>
 
       <!-- 4단계: 대출 상환 브리핑 -->
-      <div style="background:#f1f5f9; border-radius:10px; padding:12px; font-size:11.5px; color:var(--text-sub); line-height:1.6;">
+      <div style="background:var(--surface-alt); border-radius:10px; padding:12px; font-size:11.5px; color:var(--text-sub); line-height:1.6;">
         <div style="font-weight:700; color:var(--text-main); margin-bottom:4px; display:flex; align-items:center; gap:4px;">
           <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg>
           대출 상환 플랜 브리핑
@@ -2346,10 +2384,10 @@
         </button>
       </div>
 
-      <div id="scheduleSummaryLine" style="font-size:12px; color:var(--text-sub); background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:10px;">대출 정보 확인 중...</div>
+      <div id="scheduleSummaryLine" style="font-size:12px; color:var(--text-sub); background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px 10px; margin-bottom:10px;">대출 정보 확인 중...</div>
 
-      <div style="display:flex; gap:6px; margin-bottom:10px; background:#f1f5f9; padding:4px; border-radius:12px;">
-        <button type="button" id="scheduleViewYearlyBtn" onclick="setLoanScheduleView('yearly')" style="flex:1; border:none; background:#ffffff; color:var(--primary); font-weight:700; font-size:12px; padding:8px 4px; border-radius:9px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); font-family:inherit;">연도별 요약</button>
+      <div style="display:flex; gap:6px; margin-bottom:10px; background:var(--surface-alt); padding:4px; border-radius:12px;">
+        <button type="button" id="scheduleViewYearlyBtn" onclick="setLoanScheduleView('yearly')" style="flex:1; border:none; background:var(--card-bg); color:var(--primary); font-weight:700; font-size:12px; padding:8px 4px; border-radius:9px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); font-family:inherit;">연도별 요약</button>
         <button type="button" id="scheduleViewMonthlyBtn" onclick="setLoanScheduleView('monthly')" style="flex:1; border:none; background:transparent; color:var(--text-sub); font-weight:600; font-size:12px; padding:8px 4px; border-radius:9px; cursor:pointer; font-family:inherit;">회차별 전체</button>
       </div>
 
@@ -2580,7 +2618,7 @@
       }
 
       if (savingsItems.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted); font-size:13px; background:#f8fafc; border-radius:10px; border:1px dashed var(--border); margin-bottom:8px;">등록된 자금 항목이 없습니다.<br>우측 상단 [+ 자금 항목 추가]를 눌러 보유 현금이나 성과급을 입력하세요.</div>';
+        container.innerHTML = '<div style="text-align:center; padding:16px; color:var(--text-muted); font-size:13px; background:var(--surface); border-radius:10px; border:1px dashed var(--border); margin-bottom:8px;">등록된 자금 항목이 없습니다.<br>우측 상단 [+ 자금 항목 추가]를 눌러 보유 현금이나 성과급을 입력하세요.</div>';
         document.getElementById('totalSavingsDisplay').textContent = '0원';
         return;
       }
@@ -3149,7 +3187,7 @@
           <td>${formatKoreanMoney(extraPaid)} (${paidPctExtra}%)</td>
           <td>${formatKoreanMoney(extraRemain)} (${100 - paidPctExtra}%)</td>
         </tr>
-        <tr style="background:#f8fafc; font-weight:700;">
+        <tr style="background:var(--surface); font-weight:700;">
           <td>총계 (${formatKoreanMoney(totalPriceForTax)})</td>
           <td>${formatKoreanMoney(totalPaid)}</td>
           <td style="color:var(--primary);">${formatKoreanMoney(remainPriceTotal)}</td>
@@ -3333,51 +3371,71 @@
       }
 
       if (method === 'graduated') {
-        const gAnnual = 0.024; // 한국주택금융공사 체증식 연간 표준 증가율 약 2.4%
-        const g = Math.pow(1 + gAnnual, 1 / 12) - 1;
-
-        let M1 = 0;
-        if (r === g) {
-          M1 = principalWon / n;
-        } else {
-          const ratio = (1 + g) / (1 + r);
-          M1 = principalWon * (r - g) / (1 - Math.pow(ratio, n));
+        const schedule = computeGraduatedSchedule(principalWon, years, annualRate);
+        if (schedule.length === 0) {
+          return { first: 0, last: 0, total: 0, interest: 0, annualFirstYear: 0, flow10th: 0, title: '', desc: '' };
         }
-
-        let balance = principalWon;
-        let totalPaid = 0;
-        let lastM = M1;
-        let flow10 = M1;
-        let year1Total = 0;
-
-        for (let k = 1; k <= n; k++) {
-          const curM = M1 * Math.pow(1 + g, k - 1);
-          const interestM = balance * r;
-          const principalM = curM - interestM;
-          balance -= principalM;
-          totalPaid += curM;
-
-          if (k <= 12) year1Total += curM;
-          if (k === Math.min(n, 120)) flow10 = curM;
-          if (k === n) lastM = curM;
-        }
-
-        const interest = totalPaid - principalWon;
+        const total = schedule.reduce((s, row) => s + row.payment, 0);
+        const interest = total - principalWon;
+        const first = schedule[0].payment;
+        const last = schedule[schedule.length - 1].payment;
+        const year1Count = Math.min(schedule.length, 12);
+        const annualFirstYear = schedule.slice(0, year1Count).reduce((s, row) => s + row.payment, 0);
+        const idx10 = Math.min(schedule.length, 120) - 1;
+        const flow10th = schedule[idx10].payment;
 
         return {
-          first: M1,
-          last: lastM,
-          total: totalPaid,
+          first: first,
+          last: last,
+          total: total,
           interest: interest,
-          annualFirstYear: year1Total,
-          flow10th: flow10,
-          title: '체증식분할상환 (HF 디딤돌/보금자리)',
-          desc: '초기 월 상환액을 낮게 시작하여 소득 증가와 물가 상승에 맞춰 매년 상환액이 늘어나는 방식입니다. <strong>초기 납입 부담이 가장 적습니다</strong>.'
+          annualFirstYear: annualFirstYear,
+          flow10th: flow10th,
+          title: '체증식분할상환',
+          desc: '초기 월 상환액을 낮게 시작하여 <strong>1년 단위 계단식</strong>으로 상환액이 늘어나는 방식입니다(연 약 2.4%씩 증가, 같은 해 안에서는 매월 동일). <strong>초기 납입 부담이 가장 적습니다</strong>.'
         };
       }
     }
 
     let globalReportData = {};
+
+    // 🪜 체증식(계단식) 상환 스케줄 전용 계산 - 연 단위로만 상환액이 계단식으로 증가하고
+    // 같은 해 안에서는 매월 동일 (기존엔 매월 미세하게 복리로 늘어나 부정확했음)
+    function computeGraduatedSchedule(principalWon, years, annualRate) {
+      const n = Math.round(years * 12);
+      const r = annualRate / 100 / 12;
+      const gAnnual = 0.024; // 한국주택금융공사 체증식 연간 표준 증가율 약 2.4%
+      if (principalWon <= 0 || n <= 0) return [];
+
+      function simulate(M1) {
+        let balance = principalWon;
+        const schedule = [];
+        for (let k = 1; k <= n; k++) {
+          const yearIndex = Math.floor((k - 1) / 12); // 0년차, 1년차, 2년차 ...
+          const payment = M1 * Math.pow(1 + gAnnual, yearIndex);
+          const interestPaid = balance * r;
+          const principalPaid = payment - interestPaid;
+          balance -= principalPaid;
+          schedule.push({ month: k, payment, principalPaid, interestPaid, balance });
+        }
+        return { schedule, endBalance: balance };
+      }
+
+      // 이진 탐색으로 만기 시 잔액이 0이 되는 1회차 납입액(M1) 탐색
+      let lo = 0.01;
+      let hi = principalWon;
+      let result = simulate(hi);
+      for (let i = 0; i < 80; i++) {
+        const mid = (lo + hi) / 2;
+        result = simulate(mid);
+        if (result.endBalance > 0) {
+          lo = mid;
+        } else {
+          hi = mid;
+        }
+      }
+      return result.schedule;
+    }
 
     // 📅 대출기간 전체 매달 상환 스케줄 생성 (calculateLoanMath와 동일한 계산식 사용)
     let loanScheduleData = [];
@@ -3419,23 +3477,7 @@
           schedule.push({ month: k, payment: pMonth + interestPaid, principalPaid: pMonth, interestPaid, balance });
         }
       } else if (method === 'graduated') {
-        const gAnnual = 0.024;
-        const g = Math.pow(1 + gAnnual, 1 / 12) - 1;
-        let M1;
-        if (r === g) {
-          M1 = principalWon / n;
-        } else {
-          const ratio = (1 + g) / (1 + r);
-          M1 = principalWon * (r - g) / (1 - Math.pow(ratio, n));
-        }
-        let balance = principalWon;
-        for (let k = 1; k <= n; k++) {
-          const curM = M1 * Math.pow(1 + g, k - 1);
-          const interestPaid = balance * r;
-          const principalPaid = curM - interestPaid;
-          balance -= principalPaid;
-          schedule.push({ month: k, payment: curM, principalPaid, interestPaid, balance });
-        }
+        return computeGraduatedSchedule(principalWon, years, annualRate);
       }
       return schedule;
     }
@@ -3472,7 +3514,7 @@
     function updateScheduleToggleStyle() {
       const yBtn = document.getElementById('scheduleViewYearlyBtn');
       const mBtn = document.getElementById('scheduleViewMonthlyBtn');
-      const activeStyle = 'flex:1; border:none; background:#ffffff; color:var(--primary); font-weight:700; font-size:12px; padding:8px 4px; border-radius:9px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); font-family:inherit;';
+      const activeStyle = 'flex:1; border:none; background:var(--card-bg); color:var(--primary); font-weight:700; font-size:12px; padding:8px 4px; border-radius:9px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.08); font-family:inherit;';
       const inactiveStyle = 'flex:1; border:none; background:transparent; color:var(--text-sub); font-weight:600; font-size:12px; padding:8px 4px; border-radius:9px; cursor:pointer; font-family:inherit;';
       yBtn.setAttribute('style', loanScheduleViewMode === 'yearly' ? activeStyle : inactiveStyle);
       mBtn.setAttribute('style', loanScheduleViewMode === 'monthly' ? activeStyle : inactiveStyle);
@@ -4004,7 +4046,39 @@
       }, 400);
     }
   
+    // 🌙 다크/라이트 모드 토글 (기본값: 다크)
+    const THEME_KEY = 'lakeview_calc_theme';
+
+    function applyTheme(theme) {
+      if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+      updateThemeToggleUI(theme);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      applyTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    function updateThemeToggleUI(theme) {
+      const icon = document.getElementById('themeToggleIcon');
+      const label = document.getElementById('themeToggleLabel');
+      if (!icon || !label) return;
+      if (theme === 'light') {
+        icon.textContent = '☀️';
+        label.textContent = '라이트';
+      } else {
+        icon.textContent = '🌙';
+        label.textContent = '다크';
+      }
+    }
+
     // 시작 루틴
+    updateThemeToggleUI(document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
     loadPresets();
     renderPresets();
     loadCustomCosts();
