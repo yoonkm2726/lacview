@@ -1983,6 +1983,13 @@
           </div>
           <div style="font-weight:700; color:var(--primary); font-size:14px;" id="loanPayoffFeeDisplay">0만 원</div>
         </div>
+        <div class="statutory-item" id="loanSetupFeeRow" style="display:none;">
+          <div>
+            <div style="font-weight:700; color:var(--text-main);">근저당권 설정비용 (신규 대출)</div>
+            <div style="font-size:11px; color:var(--text-muted);" id="loanSetupFeeNote">채권최고액 기준 등록면허세+법무사보수</div>
+          </div>
+          <div style="font-weight:700; color:var(--primary); font-size:14px;" id="loanSetupFeeDisplay">0만 원</div>
+        </div>
       </div>
       <div class="detail-row" style="background:var(--surface); padding:8px 10px; border-radius:8px;">
         <span style="font-weight:600;">법정 제비용 소계</span>
@@ -2468,7 +2475,8 @@
         "은행별 첫 회차 일수 계산, 거치기간 여부, 가산금리 변동 및 원 단위 절사에 따라 실제 청구액과 미세한 차이가 있을 수 있습니다.",
         "취득세(약 1,021만 원)는 지방세법 제11조 및 신생아 출산가구 취득세 감면(최대 500만 원 공제, 2024~2027년 이후 출산 연장 적용) 기준입니다.",
         "기존 주택 처분 조건부 일시적 2주택자도 3년 이내 종전자산 처분 시 신생아 감면 혜택을 동일하게 적용받을 수 있습니다.",
-        "현재 집 매도 중개수수료는 매도가 구간별 법정 상한요율로 자동 계산되며, 실제로는 중개사와 협의해 상한요율보다 낮게 책정될 수 있습니다. 근저당권 말소비용은 등록면허세·법무사 보수를 합한 개략치입니다."
+        "현재 집 매도 중개수수료는 매도가 구간별 법정 상한요율로 자동 계산되며, 실제로는 중개사와 협의해 상한요율보다 낮게 책정될 수 있습니다. 근저당권 말소비용·설정비용은 등록면허세·법무사 보수를 합한 개략치입니다.",
+        "양도소득세(매도 시 과세 대상인 경우)와 국민주택채권 매입 비용(시가표준액 기준이라 정확한 산정이 어려움)은 이 계산에 포함되어 있지 않습니다."
       ],
       firebaseConfig: {
         apiKey: "AIzaSyCtLucVUFBJcSXZqcU2eg2j5v65HUXsj0I",
@@ -2946,7 +2954,23 @@
         loanPayoffFeeRow.style.display = 'none';
       }
 
-      statutoryTotalManWon = lawyerFee + loanStampDuty + maintenanceFee + saleBrokerFee + loanPayoffFee;
+      // 🔒 근저당권 설정비용 (신규 대출 실행 시 발생 - 채권최고액 120% 기준 등록면허세 0.2% + 지방교육세 20% + 말소법무사보수 개략치)
+      const loanSetupFeeRow = document.getElementById('loanSetupFeeRow');
+      let loanSetupFee = 0;
+      if (newLoanManWon > 0) {
+        const maxClaimAmount = newLoanManWon * 1.2; // 채권최고액 (통상 대출금의 120%)
+        const registTax = maxClaimAmount * 0.002; // 등록면허세 0.2%
+        const eduTax = registTax * 0.2; // 지방교육세(등록면허세의 20%)
+        const setupLawyerFee = 20; // 설정등기 법무사보수 개략치
+        loanSetupFee = registTax + eduTax + setupLawyerFee;
+        loanSetupFeeRow.style.display = '';
+        document.getElementById('loanSetupFeeDisplay').textContent = loanSetupFee.toFixed(1) + '만 원';
+        document.getElementById('loanSetupFeeNote').textContent = `채권최고액 ${formatKoreanMoney(Math.round(maxClaimAmount))}(대출의 120%) 기준`;
+      } else {
+        loanSetupFeeRow.style.display = 'none';
+      }
+
+      statutoryTotalManWon = lawyerFee + loanStampDuty + maintenanceFee + saleBrokerFee + loanPayoffFee + loanSetupFee;
 
       document.getElementById('statutoryTotalDisplay').textContent = statutoryTotalManWon.toFixed(1) + '만 원';
     }
