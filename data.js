@@ -4,6 +4,9 @@
  * 금액 단위: 만 원 (예: 60000 = 6억 원)
  */
 const APARTMENT_CONFIG = {
+  // 설정 파일 버전 (수정 시 브라우저 캐시 및 저장값이 자동 갱신됩니다)
+  version: "1789224285853",
+
   // 사이트 제목 및 부제
   title: "라크뷰 입주 자금 & 대출 계산기",
   subTitle: "매도가와 대출액, 모일 자금을 변경하면 실시간으로 자동 계산됩니다.",
@@ -16,7 +19,11 @@ const APARTMENT_CONFIG = {
     futureSavings: 2000,    // 입주 전 모을 자금 (성과금, 급여 저축 등 2,000만 원)
     newLoan: 30000,         // 신규 디딤돌/주담대 금액 (3억 원)
     loanYears: 30,          // 대출 상환 기간 (년)
-    interestRate: 3.3       // 연 금리 (%)
+    interestRate: 3.3,      // 연 금리 (%)
+    savingsList: [
+      { id: 1, name: "현재 보유 현금/예적금", amount: 3000, category: "cash" },
+      { id: 2, name: "입주 전 급여/성과금 모을 자금", amount: 2000, category: "savings" }
+    ]
   },
 
   // 2. 분양 계약 기본 정보

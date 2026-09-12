@@ -2169,7 +2169,10 @@
   </div>
 
   <!-- 1. 외부 데이터 설정 파일 로드 -->
-  <script src="data.js"></script>
+  <script>
+    // 브라우저 캐시 무력화: data.js를 항상 서버에서 최신 상태로 직접 로드
+    document.write('<script src="data.js?v=' + Date.now() + '"><\/script>');
+  </script>
 
   <script>
     const CFG = typeof APARTMENT_CONFIG !== 'undefined' ? APARTMENT_CONFIG : {
@@ -2183,6 +2186,7 @@
     };
 
     const STORAGE_KEY = 'lakeview_calc_user_inputs_v2';
+    const CFG_VERSION_KEY = 'lakeview_calc_synced_cfg_version';
     const TAB_KEY = 'lakeview_calc_active_tab';
     const METHOD_KEY = 'lakeview_calc_repayment_method';
     const TAX_NEWBORN_KEY = 'lakeview_calc_tax_newborn';
@@ -2894,6 +2898,21 @@
     }
 
     function loadSavedOrDefaults() {
+      // 서버 data.js 파일의 버전이 변경되었거나 깃허브에서 직접 수정된 경우, 로컬 캐시를 초기화하고 서버 원본 데이터로 자동 동기화
+      try {
+        const lastSyncedVer = localStorage.getItem(CFG_VERSION_KEY);
+        if (CFG.version && lastSyncedVer !== String(CFG.version)) {
+          console.log('[동기화] 서버 data.js 최신 버전 감지:', CFG.version);
+          localStorage.removeItem(STORAGE_KEY);
+          localStorage.removeItem(SAVINGS_KEY);
+          localStorage.removeItem(PRESET_KEY);
+          localStorage.removeItem(CUSTOM_COSTS_KEY);
+          localStorage.setItem(CFG_VERSION_KEY, String(CFG.version));
+          setTimeout(() => {
+            showToast('서버의 최신 data.js 설정이 자동으로 반영되었습니다.');
+          }, 400);
+        }
+      } catch(e) {}
       let saved = null;
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -2950,8 +2969,8 @@
       } catch (e) {}
     }
 
-    function resetToDefaults() {
-      if (!confirm('모든 입력값, 보유/모을자금, 프리셋, 취득세 옵션을 기본 설정으로 초기화할까요?')) return;
+    function resetToDefaults(askConfirm = true) {
+      if (askConfirm && !confirm('서버의 data.js 기본 설정 데이터로 모든 입력값을 초기화할까요?')) return;
       try {
         localStorage.removeItem(STORAGE_KEY);
         localStorage.removeItem(PRESET_KEY);
@@ -2978,6 +2997,7 @@
       currentRepaymentMethod = 'equal-payment';
       setRepaymentMethod('equal-payment');
 
+      initSavings();
       loadPresets();
       renderPresets();
       loadCustomCosts();
